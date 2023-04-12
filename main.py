@@ -2,6 +2,7 @@ from typing import Union
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
+from statistics import mean
 
 app = FastAPI(title="Filmes API",
               description="API para gerenciar filmes e suas avaliações no Multiverso PEDRO ARAGÃO")
@@ -156,6 +157,23 @@ def get_avaliacao_do_filme(id_filme: int):
                 aval.append(avaliacao)
 
         return aval
+    except:
+        raise HTTPException(status_code=500, detail="erro interno")
+    
+@app.get("/filmes/{id_filme}/avaliacoes_media", tags=["Filmes", "Avaliações"])
+def get_avaliacao_media_filme(id_filme: int):
+    """Retorna a média das avaliações de um filme do banco de dado"""
+    if verifica_id_filme(id_filme):
+        raise HTTPException(status_code=404, detail="filme não encontrado")
+
+    try:
+        aval = []
+        for avaliacao in banco["avaliacoes"]:
+            if avaliacao.id_filme == id_filme:
+                aval.append(avaliacao.nota)
+
+        return [mean(aval)]
+    
     except:
         raise HTTPException(status_code=500, detail="erro interno")
     
