@@ -3,3 +3,5 @@
 
 
 # Projeto 1 SQL - API de gerenciamento de filmes 
+
+Link video: https://youtu.be/iCwl7IdZQj0
