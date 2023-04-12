@@ -4,8 +4,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 app = FastAPI(title="Filmes API",
-              description="API para gerenciar filmes e suas avaliações")
-
+              description="API para gerenciar filmes e suas avaliações no Multiverso PEDRO ARAGÃO")
 
 class Filme(BaseModel):
     """Modelo de filme"""
@@ -75,29 +74,18 @@ def verifica_id_avaliacao(id_avaliacao: int):
     return False
 
 @app.post("/filmes/adiciona", tags=["Filmes"])
-def create_filme(filme: Filme):
+def create_filme(name: str, description: Union[str, None] = None):
     """Adiciona um filme ao banco de dados"""
     try:
-        banco["filmes"].append(filme)
-        banco["filmes"][-1].id_filme = banco["filmes"][-2].id_filme + 1 if len(banco["filmes"]) > 1 else 0
+        if "pedro" not in name.lower():
+            return {"detail":"Nome do filme inválido, no multiverso Pedro não existe filmes sem ele"}
+        
+        filme_create = Filme(name=name, description=description, id_filme = banco["filmes"][-1].id_filme + 1 if len(banco["filmes"]) >= 1 else 0)
+        banco["filmes"].append(filme_create)
         return banco["filmes"][-1]
     except:
         raise HTTPException(status_code=500, detail="erro interno")
-
-
-@app.post("/avaliacao/adiciona", tags=["Avaliações"])
-def create_avaliacao(avaliacao: Avaliacao):
-    """Adiciona uma avaliação ao banco de dados"""
-    if verifica_id_filme(avaliacao.id_filme):
-        raise HTTPException(status_code=404, detail="filme não encontrado")
-
-    try:
-        banco["avaliacoes"].append(avaliacao)
-        banco["avaliacoes"][-1].id_avaliacao = banco["avaliacoes"][-2].id_avaliacao + 1 if len(banco["avaliacoes"]) > 1 else 0
-        return banco["avaliacoes"][-1]
-    except:
-        raise HTTPException(status_code=500, detail="erro interno")
-
+    
 
 @app.get("/filmes", tags=["Filmes"])
 def get_filmes():
@@ -106,17 +94,8 @@ def get_filmes():
         return banco["filmes"]
     except:
         raise HTTPException(status_code=500, detail="erro interno")
-
-
-@app.get("/avaliacoes", tags=["Avaliações"])
-def get_avaliacoes():
-    """Retorna todas as avaliações do banco de dados"""
-    try:
-        return banco["avaliacoes"]
-    except:
-        raise HTTPException(status_code=500, detail="erro interno")
-
-
+    
+  
 @app.get("/filmes/{id_filme}", tags=["Filmes"])
 def get_filme_id(id_filme: int):
     """Retorna um filme do banco de dados"""
@@ -127,16 +106,39 @@ def get_filme_id(id_filme: int):
         return banco["filmes"][id_filme]
     except:
         raise HTTPException(status_code=500, detail="erro interno")
-
-
-@app.get("/avaliacoes/{id_avaliacao}", tags=["Avaliações"])
-def get_avaliacao_id(id_avaliacao: int):
-    """Retorna uma avaliação do banco de dados"""
-    if verifica_id_avaliacao(id_avaliacao):
-        raise HTTPException(status_code=404, detail="avaliação não encontrada")
     
+
+@app.put("/filmes/{id_filme}", tags=["Filmes"])
+def update_filme(id_filme: int, name:  Union[str, None] = None, description: Union[str, None] = None):
+    """Atualiza um filme do banco de dados"""
+    if verifica_id_filme(id_filme):
+        raise HTTPException(status_code=404, detail="filme não encontrado")
+
     try:
-        return banco["avaliacoes"][id_avaliacao]
+        if "pedro" not in name.lower() and name is not None:
+            return {"detail":"Nome do filme inválido, no multiverso Pedro não existe filmes sem ele"}
+        
+        encontra_id = [i for i in range(len(banco["filmes"])) if banco["filmes"][i].id_filme==id_filme][0]
+        if description is not None:
+            banco["filmes"][encontra_id].description = description
+        if name is not None:
+            banco["filmes"][encontra_id].name = name
+        return banco["filmes"][encontra_id]
+    except:
+        raise HTTPException(status_code=500, detail="erro interno")
+    
+
+@app.delete("/filmes/{id_filme}", tags=["Filmes"])
+def delete_filme(id_filme: int):
+    """Deleta um filme do banco de dados"""
+    print(verifica_id_filme(id_filme))
+    if verifica_id_filme(id_filme):
+        raise HTTPException(status_code=404, detail="filme não encontrado")
+
+    try:
+        # exclui o filme do banco de dados
+        banco["filmes"].pop([i for i in range(len(banco["filmes"])) if banco["filmes"][i].id_filme==id_filme][0])
+        return {"detail": "filme deletado"}
     except:
         raise HTTPException(status_code=500, detail="erro interno")
 
@@ -156,6 +158,44 @@ def get_avaliacao_do_filme(id_filme: int):
         return aval
     except:
         raise HTTPException(status_code=500, detail="erro interno")
+    
+
+@app.post("/avaliacao/adiciona", tags=["Avaliações"])
+def create_avaliacao(id_filme: int, nota: float, description: Union[str,None] = None):
+    """Adiciona uma avaliação ao banco de dados"""
+    if verifica_id_filme(id_filme):
+        raise HTTPException(status_code=404, detail="filme não encontrado")
+    
+    if nota < 0 or nota > 10:
+        raise HTTPException(status_code=400, detail="nota fora do intervalo (0, 10)")
+
+    try:
+        avaliacao_create = Avaliacao(description=description, id_filme=id_filme, nota=nota, id_avaliacao = banco["avaliacoes"][-1].id_avaliacao + 1 if len(banco["avaliacoes"]) >= 1 else 0)
+        banco["avaliacoes"].append(avaliacao_create)
+        return banco["avaliacoes"][-1]
+    except:
+        raise HTTPException(status_code=500, detail="erro interno")
+    
+    
+@app.get("/avaliacoes", tags=["Avaliações"])
+def get_avaliacoes():
+    """Retorna todas as avaliações do banco de dados"""
+    try:
+        return banco["avaliacoes"]
+    except:
+        raise HTTPException(status_code=500, detail="erro interno")
+    
+
+@app.get("/avaliacoes/{id_avaliacao}", tags=["Avaliações"])
+def get_avaliacao_id(id_avaliacao: int):
+    """Retorna uma avaliação do banco de dados"""
+    if verifica_id_avaliacao(id_avaliacao):
+        raise HTTPException(status_code=404, detail="avaliação não encontrada")
+    
+    try:
+        return banco["avaliacoes"][id_avaliacao]
+    except:
+        raise HTTPException(status_code=500, detail="erro interno")
 
 
 @app.delete("/avaliacao/{id_avaliacao}", tags=["Avaliações"])
@@ -171,46 +211,22 @@ def delete_avaliacao(id_avaliacao: int):
         raise HTTPException(status_code=500, detail="erro interno")
 
 
-@app.delete("/filmes/{id_filme}", tags=["Filmes"])
-def delete_filme(id_filme: int):
-    """Deleta um filme do banco de dados"""
-    print(verifica_id_filme(id_filme))
-    if verifica_id_filme(id_filme):
-        raise HTTPException(status_code=404, detail="filme não encontrado")
-
-    try:
-        # exclui o filme do banco de dados
-        banco["filmes"].pop([i for i in range(len(banco["filmes"])) if banco["filmes"][i].id_filme==id_filme][0])
-        return {"detail": "filme deletado"}
-    except:
-        raise HTTPException(status_code=500, detail="erro interno")
-
-
-@app.put("/filmes/{id_filme}", tags=["Filmes"])
-def update_filme(id_filme: int, filme: Filme):
-    """Atualiza um filme do banco de dados"""
-    if verifica_id_filme(id_filme):
-        raise HTTPException(status_code=404, detail="filme não encontrado")
-
-    try:
-        banco["filmes"][id_filme] = filme
-        banco["filmes"][id_filme].id_filme = id_filme
-
-        return banco["filmes"][id_filme]
-    except:
-        raise HTTPException(status_code=500, detail="erro interno")
-
-
 @app.put("/avaliacao/{id_avaliacao}", tags=["Avaliações"])
-def update_avaliacao(id_avaliacao: int, avaliacao: Avaliacao):
+def update_avaliacao(id_avaliacao: int, description: Union[str, None] = None, id_filme: Union[int, None] = None, nota: Union[int, None] = None):
     """Atualiza uma avaliação do banco de dados"""
     if verifica_id_avaliacao(id_avaliacao):
         raise HTTPException(status_code=404, detail="avaliação não encontrada")
 
     try:
-        banco["avaliacoes"][id_avaliacao] = avaliacao
-        banco["avaliacoes"][id_avaliacao].id_avaliacao = id_avaliacao
+        encontra_id = [i for i in range(len(banco["avaliacoes"])) if banco["avaliacoes"][i].id_avaliacao==id_avaliacao][0]
+        if description is not None:
+            banco["avaliacoes"][encontra_id].description = description
+        if id_filme is not None:
+            banco["avaliacoes"][encontra_id].id_filme = id_filme
+        if nota is not None:
+            banco["avaliacoes"][encontra_id].nota = nota
 
-        return banco["avaliacoes"][id_avaliacao]
+        return banco["avaliacoes"][encontra_id]
+    
     except:
         raise HTTPException(status_code=500, detail="erro interno")
