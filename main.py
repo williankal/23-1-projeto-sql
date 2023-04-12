@@ -58,8 +58,16 @@ class Avaliacao(BaseModel):
 
 
 banco = {
-    "filmes": [],
-    "avaliacoes": []
+    "filmes": [
+        Filme(id_filme=0, name="Pedro Aragão", description="Filme sobre o Pedro Aragão"),
+        Filme(id_filme=1, name="Pedro Aragão 2", description="Filme sobre o Pedro Aragão 2"),
+        Filme(id_filme=2, name="Pedro Aragão 3", description="Filme sobre o Pedro Aragão 3"),
+    ],
+    "avaliacoes": [
+        Avaliacao(id_avaliacao=0, description="Filme muito bom", nota=10.0, id_filme=0),
+        Avaliacao(id_avaliacao=1, description="Filme medio", nota=5.0, id_filme=1),
+        Avaliacao(id_avaliacao=2, description="Filme maravilhoso", nota=8.6, id_filme=1),
+    ]
 }
 
 def verifica_id_filme(id_filme: int):
@@ -114,12 +122,13 @@ def update_filme(id_filme: int, name:  Union[str, None] = None, description: Uni
     """Atualiza um filme do banco de dados"""
     if verifica_id_filme(id_filme):
         raise HTTPException(status_code=404, detail="filme não encontrado")
-
     try:
-        if "pedro" not in name.lower() and name is not None:
+        if name is not None and "pedro" not in name.lower():
             return {"detail":"Nome do filme inválido, no multiverso Pedro não existe filmes sem ele"}
         
+        print([i for i in range(len(banco["filmes"])) if banco["filmes"][i].id_filme==id_filme][0])
         encontra_id = [i for i in range(len(banco["filmes"])) if banco["filmes"][i].id_filme==id_filme][0]
+        print(encontra_id)
         if description is not None:
             banco["filmes"][encontra_id].description = description
         if name is not None:
@@ -139,6 +148,13 @@ def delete_filme(id_filme: int):
     try:
         # exclui o filme do banco de dados
         banco["filmes"].pop([i for i in range(len(banco["filmes"])) if banco["filmes"][i].id_filme==id_filme][0])
+
+        lista_avaliacoes = [i for i in banco["avaliacoes"] if i.id_filme == id_filme]
+
+        for avaliacao in lista_avaliacoes:
+            if avaliacao.id_filme == id_filme:
+                banco["avaliacoes"].remove(avaliacao)
+                        
         return {"detail": "filme deletado"}
     except:
         raise HTTPException(status_code=500, detail="erro interno")
@@ -171,8 +187,10 @@ def get_avaliacao_media_filme(id_filme: int):
         for avaliacao in banco["avaliacoes"]:
             if avaliacao.id_filme == id_filme:
                 aval.append(avaliacao.nota)
+        if not aval:
+            return {"detail":"filme não possui avaliações"}
 
-        return [mean(aval)]
+        return mean(aval)
     
     except:
         raise HTTPException(status_code=500, detail="erro interno")
@@ -234,6 +252,13 @@ def update_avaliacao(id_avaliacao: int, description: Union[str, None] = None, id
     """Atualiza uma avaliação do banco de dados"""
     if verifica_id_avaliacao(id_avaliacao):
         raise HTTPException(status_code=404, detail="avaliação não encontrada")
+    
+    if verifica_id_filme(id_filme) and id_filme is not None:
+        raise HTTPException(status_code=404, detail="filme não encontrado")
+    
+    if (nota is not None):
+        if nota < 0 or nota > 10:
+            raise HTTPException(status_code=400, detail="nota fora do intervalo (0, 10)")
 
     try:
         encontra_id = [i for i in range(len(banco["avaliacoes"])) if banco["avaliacoes"][i].id_avaliacao==id_avaliacao][0]
