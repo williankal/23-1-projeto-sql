@@ -122,8 +122,6 @@ def update_filme(id_filme: int, name:  Union[str, None] = None, description: Uni
     """Atualiza um filme do banco de dados"""
     if verifica_id_filme(id_filme):
         raise HTTPException(status_code=404, detail="filme não encontrado")
-
-    print("ENTROUUUUUUUUUu")
     try:
         if name is not None and "pedro" not in name.lower():
             return {"detail":"Nome do filme inválido, no multiverso Pedro não existe filmes sem ele"}
@@ -189,7 +187,7 @@ def get_avaliacao_media_filme(id_filme: int):
         for avaliacao in banco["avaliacoes"]:
             if avaliacao.id_filme == id_filme:
                 aval.append(avaliacao.nota)
-        if aval is None:
+        if not aval:
             return {"detail":"filme não possui avaliações"}
 
         return [mean(aval)]
