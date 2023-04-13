@@ -248,7 +248,7 @@ def delete_avaliacao(id_avaliacao: int):
 
 
 @app.put("/avaliacao/{id_avaliacao}", tags=["Avaliações"])
-def update_avaliacao(id_avaliacao: int, description: Union[str, None] = None, id_filme: Union[int, None] = None, nota: Union[int, None] = None):
+def update_avaliacao(id_avaliacao: int, description: Union[str, None] = None, id_filme: Union[int, None] = None, nota: Union[float, None] = None):
     """Atualiza uma avaliação do banco de dados"""
     if verifica_id_avaliacao(id_avaliacao):
         raise HTTPException(status_code=404, detail="avaliação não encontrada")
