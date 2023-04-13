@@ -190,7 +190,7 @@ def get_avaliacao_media_filme(id_filme: int):
         if not aval:
             return {"detail":"filme não possui avaliações"}
 
-        return [mean(aval)]
+        return mean(aval)
     
     except:
         raise HTTPException(status_code=500, detail="erro interno")
