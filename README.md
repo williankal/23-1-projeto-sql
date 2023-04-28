@@ -8,6 +8,9 @@ Alunos:
 - Pedro Henrique Britto Aragão Andrade
 - Willian Kenzo
 
+### Diagrama ER do projeto final de Megadados:
+![Diagrama ER](/diagramaERproj1.jpg)
+
 ## API de Filmes e Avaliações
 A API de Filmes e Avaliações é uma aplicação em Python que utiliza o framework FastAPI para criar uma API para gerenciar filmes e suas avaliações.
 
