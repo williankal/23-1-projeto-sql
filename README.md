@@ -378,4 +378,6 @@ Retorno de exemplo:
 As rotas utilizam a biblioteca pydantic para validar os dados de entrada e de saída da aplicação. Além disso, a aplicação também inclui duas funções auxiliares (`verifica_id_filme` e `verifica_id_avaliacao`) que verificam se um ID de filme ou avaliação existe no banco de dados antes de executar uma operação de busca ou atualização.
 
 Link video: https://youtu.be/iCwl7IdZQj0
+
+
 Link video Projeto-parte2[ENTREGA FINAL]: https://youtu.be/iDUTRz5gC00
