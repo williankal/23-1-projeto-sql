@@ -4,6 +4,9 @@
 
 # Projeto 1 SQL - API de gerenciamento de filmes
 
+#### Link video Projeto-parte2[ENTREGA FINAL]: https://youtu.be/iDUTRz5gC00
+
+
 Alunos: 
 - Pedro Henrique Britto Aragão Andrade
 - Willian Kenzo
@@ -380,4 +383,3 @@ As rotas utilizam a biblioteca pydantic para validar os dados de entrada e de sa
 Link video: https://youtu.be/iCwl7IdZQj0
 
 
-Link video Projeto-parte2[ENTREGA FINAL]: https://youtu.be/iDUTRz5gC00
