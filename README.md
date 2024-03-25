@@ -1,5 +1,5 @@
-# 23-1-projeto-sql-pedroandrade-umdadofilosofal
-23-1-projeto-sql-pedroandrade-umdadofilosofal created by GitHub Classroom
+# 23-1-projeto-sql
+23-1-projeto-sqlcreated by GitHub Classroom
 
 
 # Projeto 1 SQL - API de gerenciamento de filmes
